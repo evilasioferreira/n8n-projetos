@@ -1,0 +1,499 @@
+{
+  "name": "RAG",
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "77c23b16-8374-468a-9f19-0c9839f7df0e",
+              "name": "file_id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        336,
+        0
+      ],
+      "id": "5ca3db90-b2ad-4c41-aca9-a402aef18a6e",
+      "name": "set_file_id"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $('set_file_id').item.json.file_id }}",
+          "mode": "id"
+        },
+        "options": {
+          "googleFileConversion": {
+            "conversion": {
+              "docsToFormat": "text/plain"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        720,
+        0
+      ],
+      "id": "7bc3429c-c24a-4da8-8353-855679c1327e",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FWuxftiQ4nuNwwKc",
+          "name": "Google Drive `evilasio`"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        1312,
+        0
+      ],
+      "id": "42631313-b1f1-401b-97e1-e9221cb45ad0",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "uMdA0ZxHJpshhCgk",
+          "name": "Supabase `evilasio`"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        1200,
+        256
+      ],
+      "id": "09f6f9d5-1106-4fa1-aa86-4e5aae7ef0cb",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "v7TRDvUoueOMix3u",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Extract from File1').item.json.data }}",
+        "textSplittingMode": "custom",
+        "options": {
+          "metadata": {
+            "metadataValues": [
+              {
+                "name": "=file_id",
+                "value": "={{ $('set_file_id').item.json.file_id }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        1376,
+        256
+      ],
+      "id": "4927318a-9dfa-4a3c-bb59-361512813423",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        416
+      ],
+      "id": "4acf8b5d-cba2-4cae-ab11-2fbb02527114",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "documents",
+        "filterType": "string",
+        "filterString": "=metadata->>file_id=like.*{{ $json.file_id }}*"
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        544,
+        0
+      ],
+      "id": "124ed4c0-0ce6-4ccd-bf22-7e1579ec4325",
+      "name": "Delete a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "uMdA0ZxHJpshhCgk",
+          "name": "Supabase `evilasio`"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1zR9ON4tnb90YNvYkWmqcZspVRymKBJrC",
+          "mode": "list",
+          "cachedResultName": "Zerando o Chile",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zR9ON4tnb90YNvYkWmqcZspVRymKBJrC"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        -112
+      ],
+      "id": "d43b624d-757c-4547-8db6-aaa69faaea71",
+      "name": "arquivoCriado",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FWuxftiQ4nuNwwKc",
+          "name": "Google Drive `evilasio`"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyX",
+              "value": 1,
+              "unit": "minutes"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1zR9ON4tnb90YNvYkWmqcZspVRymKBJrC",
+          "mode": "list",
+          "cachedResultName": "Zerando o Chile",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1zR9ON4tnb90YNvYkWmqcZspVRymKBJrC"
+        },
+        "event": "fileUpdated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        128,
+        96
+      ],
+      "id": "0a963005-71a2-4166-b647-9bf208ab52e4",
+      "name": "arquivoEditado",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "FWuxftiQ4nuNwwKc",
+          "name": "Google Drive `evilasio`"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        0
+      ],
+      "id": "eebb627c-688f-47f4-ad9b-dc139acbee7f",
+      "name": "Extract from File1"
+    }
+  ],
+  "pinData": {
+    "arquivoCriado": [
+      {
+        "json": {
+          "parents": [
+            "1zR9ON4tnb90YNvYkWmqcZspVRymKBJrC"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Evilasio Ferreira",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "05682481932847575179",
+            "emailAddress": "evilasio.f.filho@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Evilasio Ferreira",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "05682481932847575179",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "05682481932847575179",
+              "type": "user",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "role": "owner",
+              "displayName": "Evilasio Ferreira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": false,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": true,
+            "canChangeItemDownloadRestriction": true,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": true,
+            "canComment": true,
+            "canCopy": true,
+            "canDelete": true,
+            "canDisableInheritedPermissions": false,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": false,
+            "canModifyContent": true,
+            "canModifyContentRestriction": true,
+            "canModifyEditorContentRestriction": true,
+            "canModifyOwnerContentRestriction": true,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": false,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": true,
+            "canRemoveChildren": false,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "05682481932847575179"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1TPr_Wu6CxxKjO1bhQNziCBiciHYe27Ts",
+          "name": "PORTFOLIO SANTIAGO VERAO.pdf",
+          "mimeType": "application/pdf",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "2",
+          "webContentLink": "https://drive.google.com/uc?id=1TPr_Wu6CxxKjO1bhQNziCBiciHYe27Ts&export=download",
+          "webViewLink": "https://drive.google.com/file/d/1TPr_Wu6CxxKjO1bhQNziCBiciHYe27Ts/view?usp=drivesdk",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/pdf",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-11-22T22:10:53.666Z",
+          "createdTime": "2025-11-22T22:10:53.666Z",
+          "modifiedTime": "2025-11-19T14:04:50.000Z",
+          "modifiedByMeTime": "2025-11-19T14:04:50.000Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "originalFilename": "PORTFOLIO SANTIAGO VERAO.pdf",
+          "fullFileExtension": "pdf",
+          "fileExtension": "pdf",
+          "md5Checksum": "363d859771e4d7d0acc10daf6c86a91b",
+          "sha1Checksum": "f8ffe7dc86a8934ef2427231872bc3ffc28bc214",
+          "sha256Checksum": "5bb3846c115cb3701ba92ea1fa9f5e7e5df38c365c4adf8a158c5466c5c2bcd7",
+          "size": "61479682",
+          "quotaBytesUsed": "61479682",
+          "headRevisionId": "0B-oo9xR4d0rJTGJETnJFYjA2NUJZUXFsS3FJR0NYZmhvWlZZPQ",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    "set_file_id": {
+      "main": [
+        [
+          {
+            "node": "Delete a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a row": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "arquivoCriado": {
+      "main": [
+        [
+          {
+            "node": "set_file_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "arquivoEditado": {
+      "main": [
+        [
+          {
+            "node": "set_file_id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "5923c320-a378-454a-a549-0f0b9425a8e6",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "41774c5b6afa977d3518ad6370cf2742eb36eaeac2b1296bbb3fad63cc878edf"
+  },
+  "id": "Kvq8ozMSU0jCrMPQ",
+  "tags": []
+}
