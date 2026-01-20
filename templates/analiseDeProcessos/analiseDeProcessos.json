@@ -1,0 +1,642 @@
+{
+  "name": "analiseDeProcessos",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Api Key\n\nAuthorization: APIKey **cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==**",
+        "height": 144,
+        "width": 384
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        2048,
+        544
+      ],
+      "typeVersion": 1,
+      "id": "30ae9e7a-4a72-4b0c-96f6-8657511afa02",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        272,
+        480
+      ],
+      "id": "e76b347d-54be-4f52-8c47-109d1a4e37ae",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "53b37cb6-93f4-4796-8a61-2ad60b97d93d",
+              "leftValue": "={{ $json.valido }}",
+              "rightValue": "",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        912,
+        304
+      ],
+      "id": "145c7ee3-cc17-4852-a872-56276cb92d92",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "content": "## 1 - Pesquisar pelo número de processo  e\n## 2 - Pesquisar por Classe Processual e Órgão Julgador",
+        "height": 304,
+        "width": 1968
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        192
+      ],
+      "typeVersion": 1,
+      "id": "b85efd73-1de8-4c71-a750-99d4ca87dff6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=ApiKey {{ $json.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1344,
+        304
+      ],
+      "id": "a2789fbc-3009-4a15-a7d7-795874519344",
+      "name": "API"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=ApiKey {{ $json.apiKey }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json.body }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        736,
+        624
+      ],
+      "id": "b2339f3b-4685-4c30-a27e-9262fbd28fd1",
+      "name": "API "
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1BCSOs0GFeMutPCT9psQpVxpqTXpec-s1ouebjhbju_o",
+          "mode": "list",
+          "cachedResultName": "teste vicio",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BCSOs0GFeMutPCT9psQpVxpqTXpec-s1ouebjhbju_o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1BCSOs0GFeMutPCT9psQpVxpqTXpec-s1ouebjhbju_o/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        512,
+        304
+      ],
+      "id": "7808c84a-1481-42ef-ab3b-ca506adf9367",
+      "name": "base",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "p0tGmtGStf7vHRLi",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  // Número do processo\n  let rawProcesso = item.json['Números dos Processos'] || '';\n  if (typeof rawProcesso !== 'string') rawProcesso = String(rawProcesso);\n\n  // Remove tudo que não for número\n  let numero = rawProcesso.replace(/[^\\d]/g, '');\n\n  // Classe e Órgão\n  const classeRaw = item.json['Classe '] || '';\n  const orgaoRaw = item.json['Orgao'] || '';\n\n  // Validação: número de processo válido (20 dígitos) ou ambos classe e órgão preenchidos\n  const valido = (numero.length === 20) || (classeRaw && orgaoRaw);\n\n  return {\n    json: {\n      ...item.json,\n      numeroProcesso: numero, // já formatado\n      valido: !!valido         // true ou false\n    }\n  };\n});\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        304
+      ],
+      "id": "acc10362-2f24-41a0-9cbf-3aea94cae443",
+      "name": "org dados da base",
+      "notesInFlow": true,
+      "notes": "Extrai e limpa números de processo, verifica se são válidos ou se há classe e órgão preenchidos, e adiciona essas informações ao item JSON."
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1888,
+        304
+      ],
+      "id": "c728897a-7306-452b-9ff7-adf7bf4da594",
+      "name": "Loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiKey = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';\n\nreturn items.map(item => {\n  let numero = item.json.numeroProcesso || '';\n  const classe = item.json['Classe '] || '';\n  const orgao = item.json.Orgao || '';\n  const size = item.json.size || 10;         // quantidade por página\n  const searchAfter = item.json.searchAfter || null; // ponteiro da última página\n\n  // Define tipo de consulta automaticamente\n  let tipoConsulta = '';\n  if (numero) {\n    tipoConsulta = 'numero';\n  } else if (classe && orgao) {\n    tipoConsulta = 'classe';\n  } else {\n    // Se não tem numero nem classe+orgao, assumimos paginação\n    tipoConsulta = 'paginacao';\n  }\n\n  // Define URL com base no tipo\n  let url = 'https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search';\n  if (tipoConsulta === 'classe') {\n    url = 'https://api-publica.datajud.cnj.jus.br/api_publica_tjdft/_search';\n  }\n\n  // Monta o corpo da requisição\n  let body = {};\n  if (tipoConsulta === 'numero') {\n    body = { query: { match: { numeroProcesso: numero } } };\n  } else if (tipoConsulta === 'classe') {\n    body = {\n      query: {\n        bool: {\n          must: [\n            { match: { \"classe.codigo\": classe } },\n            { match: { \"orgaoJulgador.codigo\": orgao } }\n          ]\n        }\n      }\n    };\n  } else if (tipoConsulta === 'paginacao') {\n    body = {\n      size: size,\n      sort: [{ \"@timestamp\": { order: \"asc\" } }],\n      query: { match_all: {} }\n    };\n    if (searchAfter) body.search_after = searchAfter;\n  }\n\n  // Determina se é válido\n  const valido = !!(numero || (classe && orgao) || tipoConsulta === 'paginacao');\n\n  return {\n    json: {\n      ...item.json,\n      numeroProcesso: numero,\n      valido,\n      apiKey,\n      url,\n      body\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1152,
+        304
+      ],
+      "id": "78899407-5eb0-4b83-925f-ee463a6fc1eb",
+      "name": "Montagem de requisição",
+      "notesInFlow": true,
+      "notes": "Define automaticamente o tipo de consulta (por número ou por classe+órgão), monta a URL e o corpo da requisição correspondente e adiciona tudo ao JSON do item."
+    },
+    {
+      "parameters": {
+        "resource": "messages-api",
+        "instanceName": "reservamesa",
+        "remoteJid": "5585998286557",
+        "messageText": "=Processo: {{ $json.numeroProcesso }}\nClasse: {{ $json.classe }}\nTribunal: {{ $json.tribunal }}\nGrau: {{ $json.grau }}\nOrgão Jugador: {{ $json.orgaoJulgador }}\nAssunto: {{ $json.assunto }}\nData de Azuizamento: {{ $json.dataAjuizamento }}\n\nMovimentos: \n{{ $json.movimentos.join(\"\\n\") }} \n\n\n",
+        "options_message": {}
+      },
+      "type": "n8n-nodes-evolution-api.evolutionApi",
+      "typeVersion": 1,
+      "position": [
+        2064,
+        704
+      ],
+      "id": "5e65b133-5444-4df4-be33-2992e6bea66c",
+      "name": "Enviar texto",
+      "credentials": {
+        "evolutionApi": {
+          "id": "povLjrHJ4bpV8GXd",
+          "name": "Evolution account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2256,
+        304
+      ],
+      "id": "58f4bfab-5783-460f-912b-9933bd532adf",
+      "name": "Wait",
+      "webhookId": "bac40da1-f8ad-46bb-99af-2e82c2d2b13b"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "numeroProcesso, classe, tribunal, grau, orgaoJulgador, assunto, dataAjuizamento",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1696,
+        304
+      ],
+      "id": "7b9d7051-3add-4ff1-a846-f327c9ef9cf9",
+      "name": "Split Out"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "numeroProcesso, classe, tribunal, grau, orgaoJulgador, assunto, dataAjuizamento",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1152,
+        624
+      ],
+      "id": "02f37fdd-8347-47b5-b22e-e63f86975afc",
+      "name": "Split Out1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1360,
+        624
+      ],
+      "id": "ee0e4b20-4035-4abd-90f6-7889660060c1",
+      "name": "Loop1"
+    },
+    {
+      "parameters": {
+        "amount": 1
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1856,
+        624
+      ],
+      "id": "008d1d62-63db-4e47-b60d-f3e284e405a0",
+      "name": "Wait1",
+      "webhookId": "bac40da1-f8ad-46bb-99af-2e82c2d2b13b"
+    },
+    {
+      "parameters": {
+        "chatId": "=8405862550",
+        "text": "=Processo: {{ $json.numeroProcesso }}\nClasse: {{ $json.classe }}\nTribunal: {{ $json.tribunal }}\nGrau: {{ $json.grau }}\nOrgão Jugador: {{ $json.orgaoJulgador }}\nAssunto: {{ $json.assunto }}\nData de Azuizamento: {{ $json.dataAjuizamento }}\n\nMovimentos: \n{{ $json.movimentos.join(\"\\n\") }} \n\n\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1632,
+        624
+      ],
+      "id": "b4b7416c-a004-4829-9cfe-3db509d18b42",
+      "name": "Send a text message1",
+      "webhookId": "42f7678e-74b1-4819-bdf9-120ae2368769",
+      "credentials": {
+        "telegramApi": {
+          "id": "hn8m6CmL62yZTvia",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## 3 - Paginacao",
+        "height": 272,
+        "width": 1568
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        464,
+        544
+      ],
+      "typeVersion": 1,
+      "id": "dfc51b3e-6fd3-4d49-8e09-86d4f5a47fde",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const apiKey = 'cDZHYzlZa0JadVREZDJCendQbXY6SkJlTzNjLV9TRENyQk1RdnFKZGRQdw==';\n\nreturn items.map(item => {\n  const size = item.json.size || 10;           // quantidade de registros por página\n  const searchAfter = item.json.searchAfter || null; // ponteiro da última página\n\n  // URL da API TRF1\n  const url = 'https://api-publica.datajud.cnj.jus.br/api_publica_trf1/_search';\n\n  // Corpo da requisição para paginação geral\n  const body = {\n    size: size,\n    sort: [{ \"@timestamp\": { order: \"asc\" } }],\n    query: { match_all: {} }\n  };\n\n  if (searchAfter) {\n    body.search_after = searchAfter;\n  }\n\n  return {\n    json: {\n      ...item.json,\n      valido: true,\n      apiKey,\n      url,\n      body\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        544,
+        624
+      ],
+      "id": "08caf54d-089d-4098-a25b-9b00786e7d72",
+      "name": "Montagem de requisição ",
+      "notesInFlow": true,
+      "notes": "Define automaticamente o tipo de consulta (por número ou por classe+órgão), monta a URL e o corpo da requisição correspondente e adiciona tudo ao JSON do item."
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.flatMap(item => {\n  const data = Array.isArray(item.json) ? item.json[0] : item.json;\n  const hits = data?.hits?.hits || [];\n\n  return hits.map(proc => {\n    const src = proc._source || {};\n\n    const numero = src.numeroProcesso || \"N/A\";\n    const classe = src.classe?.nome || \"N/A\";\n    const tribunal = src.tribunal || \"N/A\";\n    const grau = src.grau || \"N/A\";\n    const orgao = src.orgaoJulgador?.nome || \"N/A\";\n    const assunto = (src.assuntos && src.assuntos.length > 0) \n      ? src.assuntos.map(a => a.nome).join(\", \") \n      : \"N/A\";\n    const ajuizamento = src.dataAjuizamento \n      ? new Date(src.dataAjuizamento).toLocaleDateString(\"pt-BR\") \n      : \"N/A\";\n\n    const movimentos = (src.movimentos || []).map(m => {\n      const data = m.dataHora \n        ? new Date(m.dataHora).toLocaleDateString(\"pt-BR\") \n        : \"N/A\";\n      const nome = m.nome || \"N/A\";\n\n      let complemento = \"\";\n      if (m.complementosTabelados && m.complementosTabelados.length > 0) {\n        complemento = \" (\" + m.complementosTabelados\n          .map(c => `${c.nome}: ${c.valor}`)\n          .join(\", \") + \")\";\n      }\n\n      return `${data} - ${nome}${complemento}`;\n    });\n\n    // Cada processo será um item do n8n\n    return {\n      json: {\n        numeroProcesso: numero,\n        classe,\n        tribunal,\n        grau,\n        orgaoJulgador: orgao,\n        assunto,\n        dataAjuizamento: ajuizamento,\n        movimentos\n      }\n    };\n  });\n});\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        304
+      ],
+      "id": "5220bc16-3359-496f-af6f-ecdb7dd5078a",
+      "name": "Organiza dados API",
+      "notesInFlow": true,
+      "notes": "Organiza os dados recuperados da consulta da API"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.flatMap(item => {\n  const data = Array.isArray(item.json) ? item.json[0] : item.json;\n  const hits = data?.hits?.hits || [];\n\n  return hits.map(proc => {\n    const src = proc._source || {};\n\n    const numero = src.numeroProcesso || \"N/A\";\n    const classe = src.classe?.nome || \"N/A\";\n    const tribunal = src.tribunal || \"N/A\";\n    const grau = src.grau || \"N/A\";\n    const orgao = src.orgaoJulgador?.nome || \"N/A\";\n    const assunto = (src.assuntos && src.assuntos.length > 0) \n      ? src.assuntos.map(a => a.nome).join(\", \") \n      : \"N/A\";\n    const ajuizamento = src.dataAjuizamento \n      ? new Date(src.dataAjuizamento).toLocaleDateString(\"pt-BR\") \n      : \"N/A\";\n\n    const movimentos = (src.movimentos || []).map(m => {\n      const data = m.dataHora \n        ? new Date(m.dataHora).toLocaleDateString(\"pt-BR\") \n        : \"N/A\";\n      const nome = m.nome || \"N/A\";\n\n      let complemento = \"\";\n      if (m.complementosTabelados && m.complementosTabelados.length > 0) {\n        complemento = \" (\" + m.complementosTabelados\n          .map(c => `${c.nome}: ${c.valor}`)\n          .join(\", \") + \")\";\n      }\n\n      return `${data} - ${nome}${complemento}`;\n    });\n\n    // Cada processo será um item do n8n\n    return {\n      json: {\n        numeroProcesso: numero,\n        classe,\n        tribunal,\n        grau,\n        orgaoJulgador: orgao,\n        assunto,\n        dataAjuizamento: ajuizamento,\n        movimentos\n      }\n    };\n  });\n});\n\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        928,
+        624
+      ],
+      "id": "67bc266a-5b04-477a-a48d-9529fca19e68",
+      "name": "Organiza dados API ",
+      "notesInFlow": true,
+      "notes": "Organiza os dados recuperados da consulta da API"
+    },
+    {
+      "parameters": {
+        "chatId": "=8405862550",
+        "text": "=Processo: {{ $json.numeroProcesso }}\nClasse: {{ $json.classe }}\nTribunal: {{ $json.tribunal }}\nGrau: {{ $json.grau }}\nOrgão Jugador: {{ $json.orgaoJulgador }}\nAssunto: {{ $json.assunto }}\nData de Azuizamento: {{ $json.dataAjuizamento }}\n\nMovimentos: \n{{ $json.movimentos.join(\"\\n\") }} \n\n\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2096,
+        304
+      ],
+      "id": "30f0af7b-77f2-4187-a2fd-e2fb30e6231c",
+      "name": "Send a text message",
+      "webhookId": "42f7678e-74b1-4819-bdf9-120ae2368769",
+      "credentials": {
+        "telegramApi": {
+          "id": "hn8m6CmL62yZTvia",
+          "name": "Telegram account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Montagem de requisição ",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Montagem de requisição",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API": {
+      "main": [
+        [
+          {
+            "node": "Organiza dados API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "base": {
+      "main": [
+        [
+          {
+            "node": "org dados da base",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "org dados da base": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montagem de requisição": {
+      "main": [
+        [
+          {
+            "node": "API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar texto": {
+      "main": [
+        []
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out1": {
+      "main": [
+        [
+          {
+            "node": "Loop1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "API ": {
+      "main": [
+        [
+          {
+            "node": "Organiza dados API ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Montagem de requisição ": {
+      "main": [
+        [
+          {
+            "node": "API ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organiza dados API": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Organiza dados API ": {
+      "main": [
+        [
+          {
+            "node": "Split Out1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "c7b82d9f-10a7-467c-b1ba-f4ab76c1590f",
+  "meta": {
+    "instanceId": "3af4fece396f82e5b895367bb630521fea8d747ed0a2c16a12dee9ce6c9968e5"
+  },
+  "id": "RRWVeUDOmxNA31iX",
+  "tags": []
+}
