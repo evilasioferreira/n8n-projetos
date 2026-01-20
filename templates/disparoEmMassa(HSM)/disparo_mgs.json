@@ -1,0 +1,420 @@
+{
+  "name": "disparo_mgs",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -16
+      ],
+      "id": "4d4a6922-b1f5-4a29-8cb1-2b078ec34084",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA",
+          "mode": "list",
+          "cachedResultName": "base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -80,
+        -16
+      ],
+      "id": "1161d809-446b-4080-84e6-1c581ab78c62",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "p0tGmtGStf7vHRLi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        128,
+        -16
+      ],
+      "id": "54869a72-b60a-4a0d-96b8-a1bdcd19bd8b",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        384,
+        -16
+      ],
+      "id": "35a87654-2491-42e0-81f3-a2a8fe35369d",
+      "name": "Wait",
+      "webhookId": "b252086a-40c7-49e4-adf2-5246f2d9b8dc"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "7700da6e-9bfb-4c15-bc67-add7df3916e2",
+      "name": "Wait1",
+      "webhookId": "1cd91b7d-3e61-451a-a64e-2111994f7fd6"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://evo.atendon.com.br/message/sendText/disparoMSG",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "apikey",
+              "value": "0BD07E8E88AC-44ED-963A-DEF15C556178"
+            }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "number",
+              "value": "=+{{ $json.Numero }}"
+            },
+            {
+              "name": "text",
+              "value": "Ola"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        608,
+        -16
+      ],
+      "id": "fabc0d68-4c72-43f9-835e-3c9c60796833",
+      "name": "enviaText",
+      "executeOnce": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA",
+          "mode": "list",
+          "cachedResultName": "base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Wait').item.json.row_number }}",
+            "Status": "FALHA NO ENVIO"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Numero",
+              "displayName": "Numero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        0
+      ],
+      "id": "25484bc4-3cc8-42c6-83b5-69269a9cfc05",
+      "name": "seERRO",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "p0tGmtGStf7vHRLi",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA",
+          "mode": "list",
+          "cachedResultName": "base",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Página1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1jDB07Io7dyxGkBbvNbGfyLdpNSxSAx_uVKbdifTc9BA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Wait').item.json.row_number }}",
+            "Status": "ENVIADO"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Cliente",
+              "displayName": "Cliente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Numero",
+              "displayName": "Numero",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        928,
+        -192
+      ],
+      "id": "3e32b906-60cc-4042-be24-cb39f2fe2ab2",
+      "name": "seOK",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "p0tGmtGStf7vHRLi",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "enviaText",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "enviaText": {
+      "main": [
+        [
+          {
+            "node": "seOK",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "seERRO",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seERRO": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "seOK": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "f707c55d-caa5-4831-8999-a786a37f99c1",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3af4fece396f82e5b895367bb630521fea8d747ed0a2c16a12dee9ce6c9968e5"
+  },
+  "id": "GDHhO0keqs0CK6IT",
+  "tags": [
+    {
+      "createdAt": "2025-11-12T12:23:34.954Z",
+      "updatedAt": "2025-11-12T12:23:34.954Z",
+      "id": "lw9FNkMJwR1KXClQ",
+      "name": "Produção"
+    }
+  ]
+}
