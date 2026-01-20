@@ -1,0 +1,736 @@
+{
+  "name": "backup",
+  "nodes": [
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2507663f-1a26-45e5-ae9e-e505e115590d",
+              "leftValue": "={{ $json.timeDifference.days }}",
+              "rightValue": 2,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2496,
+        720
+      ],
+      "id": "26e182d5-4342-4706-8a22-efc9d46a9354",
+      "name": ">15d"
+    },
+    {
+      "parameters": {
+        "operation": "getTimeBetweenDates",
+        "startDate": "={{ new Date($json.createdTime).toISOString().split('T')[0] }}",
+        "endDate": "={{ new Date().toISOString().split('T')[0] }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 2,
+      "position": [
+        2320,
+        720
+      ],
+      "id": "18c633d6-baa8-40d2-81b2-5a5411a9fa38",
+      "name": "comparaDatas"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 4,
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        480
+      ],
+      "id": "61b154ec-ea37-4ac8-91b3-13451e1210ce",
+      "name": "start4h"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 3,
+              "triggerAtMinute": 1
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1984,
+        720
+      ],
+      "id": "5bf5adf9-0aa6-4a44-84af-18373c1353da",
+      "name": "start3h"
+    },
+    {
+      "parameters": {
+        "content": "## Delete após 15d - HML\n",
+        "height": 220,
+        "width": 996
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1936,
+        656
+      ],
+      "typeVersion": 1,
+      "id": "50d5d48e-0015-4c54-858e-427a5160784c",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Fluxos HML - diário",
+        "height": 220,
+        "width": 1420,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1936,
+        416
+      ],
+      "typeVersion": 1,
+      "id": "563dd560-4c54-4f1a-b4c5-66c59648be91",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a4766e36-a769-4366-8fff-5c1e826714a1",
+              "name": "data",
+              "value": "={{ $json.name }}",
+              "type": "string"
+            },
+            {
+              "id": "65f42e99-145e-4ba1-86b7-d86a7762e02d",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2336,
+        480
+      ],
+      "id": "e31c439a-5a6c-44b7-8e0c-62db858bb510",
+      "name": "EditFields2"
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "name": "={{ $json.Month }}-{{ $json[\"Day of month\"] }}-{{ $json.Year }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1HJYupeDiynEpa58lmXas-wRAD3zrpbIf",
+          "mode": "list",
+          "cachedResultName": "BKP_AtendON",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1HJYupeDiynEpa58lmXas-wRAD3zrpbIf"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2192,
+        480
+      ],
+      "id": "ad8dcaec-c3e3-4a70-a596-20350813304c",
+      "name": "Create folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bUu40fOjjOBdgGvf",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toJson",
+        "mode": "each",
+        "options": {
+          "format": true,
+          "fileName": "={{ $json.name }}.json\n"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        2848,
+        480
+      ],
+      "id": "0d340186-f87e-40d2-84e9-fb8ed0291ba6",
+      "name": "ConvertToJson"
+    },
+    {
+      "parameters": {
+        "jsCode": "// A variável $input.first().json.data contém o array de workflows.\nconst workflows = $input.first().json.data;\n\n// Mapeia o array de workflows para um novo array onde cada workflow\n// é encapsulado como um item individual para o n8n.\nconst output = workflows.map(workflow => {\n  return {\n    json: workflow\n  };\n});\n\n// Retorna o array de itens.\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2672,
+        480
+      ],
+      "id": "d913f502-c2ff-4369-9ef2-81f686693dd2",
+      "name": "Code",
+      "notesInFlow": true,
+      "notes": "separa cada flow"
+    },
+    {
+      "parameters": {
+        "name": "={{ $('Code').item.json.name }}",
+        "driveId": {
+          "__rl": true,
+          "mode": "list",
+          "value": "My Drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "={{ $('EditFields2').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3168,
+        480
+      ],
+      "id": "6766dcc7-5bb7-4a61-9700-cb684fa1a58c",
+      "name": "upload",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bUu40fOjjOBdgGvf",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://noiton.atendon.com.br/api/v1/workflows",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "accept",
+              "value": "application/json"
+            },
+            {
+              "name": "X-N8N-API-KEY",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJhZjM2OGJjYS1lZjI2LTQyZmItOWI0Ny0zY2M5MjA2N2UyNWEiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwiaWF0IjoxNzY4MzQ5ODAwfQ.Xd06qZRnyyZwPn_XlolSpPcJSWDSCOhLZuN8wgihrTA"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        2512,
+        480
+      ],
+      "id": "4cef7af7-6aab-4509-ae4d-6dc7e583e31f",
+      "name": "apiN8N"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3008,
+        480
+      ],
+      "id": "0f412098-4774-4df1-8c1b-14d3bf6a7a49",
+      "name": "5s",
+      "webhookId": "8ee9511a-130b-49b7-9b23-cc92770fe8dc"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "returnAll": true,
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1HJYupeDiynEpa58lmXas-wRAD3zrpbIf",
+            "mode": "list",
+            "cachedResultName": "BKP_AtendON",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1HJYupeDiynEpa58lmXas-wRAD3zrpbIf"
+          },
+          "whatToSearch": "all"
+        },
+        "options": {
+          "fields": [
+            "*"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2144,
+        720
+      ],
+      "id": "c080bb57-deac-4b04-841c-12d4e685646f",
+      "name": "listarPastas",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bUu40fOjjOBdgGvf",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "folder",
+        "operation": "deleteFolder",
+        "folderNoRootId": {
+          "__rl": true,
+          "value": "={{ $('listarPastas').item.json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        2736,
+        720
+      ],
+      "id": "d7d4d4a5-ef02-4cf4-98e5-0f415dcc4211",
+      "name": "Delete folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "bUu40fOjjOBdgGvf",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "listarPastas": [
+      {
+        "json": {
+          "parents": [
+            "1HJYupeDiynEpa58lmXas-wRAD3zrpbIf"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Evilasio Ferreira",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "05682481932847575179",
+            "emailAddress": "evilasio.f.filho@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Evilasio Ferreira",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "05682481932847575179",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "05682481932847575179",
+              "type": "user",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "role": "owner",
+              "displayName": "Evilasio Ferreira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": true,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": false,
+            "canChangeItemDownloadRestriction": false,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": false,
+            "canComment": true,
+            "canCopy": false,
+            "canDelete": true,
+            "canDisableInheritedPermissions": true,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": true,
+            "canModifyContent": true,
+            "canModifyContentRestriction": false,
+            "canModifyEditorContentRestriction": false,
+            "canModifyOwnerContentRestriction": false,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": true,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": false,
+            "canRemoveChildren": true,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "05682481932847575179"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "1bb7mBktmiUVXrPc0J84TMF-S6LZM8jJN",
+          "name": "December-16-2025",
+          "mimeType": "application/vnd.google-apps.folder",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "3",
+          "webViewLink": "https://drive.google.com/drive/folders/1bb7mBktmiUVXrPc0J84TMF-S6LZM8jJN",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/vnd.google-apps.folder",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-12-16T14:33:29.843Z",
+          "createdTime": "2025-11-16T14:33:06.079Z",
+          "modifiedTime": "2025-12-16T14:33:06.079Z",
+          "modifiedByMeTime": "2025-12-16T14:33:06.079Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "folderColorRgb": "#8f8f8f",
+          "quotaBytesUsed": "0",
+          "isAppAuthorized": true,
+          "inheritedPermissionsDisabled": false
+        }
+      },
+      {
+        "json": {
+          "parents": [
+            "1HJYupeDiynEpa58lmXas-wRAD3zrpbIf"
+          ],
+          "lastModifyingUser": {
+            "displayName": "Evilasio Ferreira",
+            "kind": "drive#user",
+            "me": true,
+            "permissionId": "05682481932847575179",
+            "emailAddress": "evilasio.f.filho@gmail.com",
+            "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+          },
+          "owners": [
+            {
+              "displayName": "Evilasio Ferreira",
+              "kind": "drive#user",
+              "me": true,
+              "permissionId": "05682481932847575179",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64"
+            }
+          ],
+          "permissions": [
+            {
+              "kind": "drive#permission",
+              "id": "05682481932847575179",
+              "type": "user",
+              "emailAddress": "evilasio.f.filho@gmail.com",
+              "role": "owner",
+              "displayName": "Evilasio Ferreira",
+              "photoLink": "https://lh3.googleusercontent.com/a/ACg8ocLfxHX90OxxIbqjVSG2Cd74E7Zpopu2CkIerqfJhw6bF1HWwLMmVw=s64",
+              "deleted": false,
+              "pendingOwner": false
+            }
+          ],
+          "spaces": [
+            "drive"
+          ],
+          "capabilities": {
+            "canAcceptOwnership": false,
+            "canAddChildren": true,
+            "canAddMyDriveParent": false,
+            "canChangeCopyRequiresWriterPermission": false,
+            "canChangeItemDownloadRestriction": false,
+            "canChangeSecurityUpdateEnabled": false,
+            "canChangeViewersCanCopyContent": false,
+            "canComment": true,
+            "canCopy": false,
+            "canDelete": true,
+            "canDisableInheritedPermissions": true,
+            "canDownload": true,
+            "canEdit": true,
+            "canEnableInheritedPermissions": true,
+            "canListChildren": true,
+            "canModifyContent": true,
+            "canModifyContentRestriction": false,
+            "canModifyEditorContentRestriction": false,
+            "canModifyOwnerContentRestriction": false,
+            "canModifyLabels": false,
+            "canMoveChildrenWithinDrive": true,
+            "canMoveItemIntoTeamDrive": true,
+            "canMoveItemOutOfDrive": true,
+            "canMoveItemWithinDrive": true,
+            "canReadLabels": false,
+            "canReadRevisions": false,
+            "canRemoveChildren": true,
+            "canRemoveContentRestriction": false,
+            "canRemoveMyDriveParent": true,
+            "canRename": true,
+            "canShare": true,
+            "canTrash": true,
+            "canUntrash": true
+          },
+          "permissionIds": [
+            "05682481932847575179"
+          ],
+          "linkShareMetadata": {
+            "securityUpdateEligible": false,
+            "securityUpdateEnabled": true
+          },
+          "downloadRestrictions": {
+            "itemDownloadRestriction": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            },
+            "effectiveDownloadRestrictionWithContext": {
+              "restrictedForReaders": false,
+              "restrictedForWriters": false
+            }
+          },
+          "kind": "drive#file",
+          "id": "16SAPojFBMj9uu1iR3ftlRPX3oa4I-XL6",
+          "name": "Pasta sem nome",
+          "mimeType": "application/vnd.google-apps.folder",
+          "starred": false,
+          "trashed": false,
+          "explicitlyTrashed": false,
+          "version": "1",
+          "webViewLink": "https://drive.google.com/drive/folders/16SAPojFBMj9uu1iR3ftlRPX3oa4I-XL6",
+          "iconLink": "https://drive-thirdparty.googleusercontent.com/16/type/application/vnd.google-apps.folder",
+          "hasThumbnail": false,
+          "thumbnailVersion": "0",
+          "viewedByMe": true,
+          "viewedByMeTime": "2025-12-16T14:32:10.430Z",
+          "createdTime": "2025-12-07T14:32:10.430Z",
+          "modifiedTime": "2025-12-16T14:32:10.430Z",
+          "modifiedByMeTime": "2025-12-16T14:32:10.430Z",
+          "modifiedByMe": true,
+          "shared": false,
+          "ownedByMe": true,
+          "viewersCanCopyContent": true,
+          "copyRequiresWriterPermission": false,
+          "writersCanShare": true,
+          "folderColorRgb": "#8f8f8f",
+          "quotaBytesUsed": "0",
+          "isAppAuthorized": false,
+          "inheritedPermissionsDisabled": false
+        }
+      }
+    ]
+  },
+  "connections": {
+    ">15d": {
+      "main": [
+        [
+          {
+            "node": "Delete folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "comparaDatas": {
+      "main": [
+        [
+          {
+            "node": ">15d",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start4h": {
+      "main": [
+        [
+          {
+            "node": "Create folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "start3h": {
+      "main": [
+        [
+          {
+            "node": "listarPastas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "EditFields2": {
+      "main": [
+        [
+          {
+            "node": "apiN8N",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create folder": {
+      "main": [
+        [
+          {
+            "node": "EditFields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "ConvertToJson",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ConvertToJson": {
+      "main": [
+        [
+          {
+            "node": "5s",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "apiN8N": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "5s": {
+      "main": [
+        [
+          {
+            "node": "upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "listarPastas": {
+      "main": [
+        [
+          {
+            "node": "comparaDatas",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "51e5a031-5360-4a7c-b8fb-a81014ae84a0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "3af4fece396f82e5b895367bb630521fea8d747ed0a2c16a12dee9ce6c9968e5"
+  },
+  "id": "yuDGOvdiNkK6deRG",
+  "tags": [
+    {
+      "createdAt": "2025-11-12T12:23:34.954Z",
+      "updatedAt": "2025-11-12T12:23:34.954Z",
+      "id": "lw9FNkMJwR1KXClQ",
+      "name": "Produção"
+    }
+  ]
+}
